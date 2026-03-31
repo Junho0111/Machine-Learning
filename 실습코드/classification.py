@@ -35,9 +35,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 
 # 로지스틱 회귀 (Logistic Regression)
 # multi_class='multinomial': 다중 분류 설정. solver='lbfgs': 효율적인 최적화 알고리즘
-log_reg_clf = LogisticRegression(multi_class='multinomial', solver='lbfgs', max_iter=1000, random_state=77)
-log_reg_clf.fit(X_train_scaled, y_train)
-y_pred_log_reg = log_reg_clf.predict(X_test_scaled)
+log_reg_clf = LogisticRegression(solver='lbfgs', max_iter=1000, random_state=77)
+log_reg_clf.fit(X_train, y_train)
+y_pred_log_reg = log_reg_clf.predict(X_test)
 
 # 모델 평가 함수 정의
 def evaluate_model(y_true, y_pred, model_name):
