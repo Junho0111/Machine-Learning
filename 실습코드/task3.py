@@ -6,6 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
 import warnings
+from sklearn.preprocessing import StandardScaler
 warnings.filterwarnings("ignore")
 
 # 한글 폰트 설정
@@ -27,28 +28,25 @@ print("Task (1): Wine 데이터셋 분류 시작...")
 
 # 1. 데이터 로드 (Wine 데이터셋: 와인 화학 성분을 바탕으로 품종(3종) 분류) - load_wine() 함수 X는 data, y는 target
 wine = load_wine()
-
-
+X = wine.data
+y = wine.target
 
 # 2. 데이터 분할 (학습 75%, 테스트 25%) + stratify 적용
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=77, stratify=y)
 
 
-
-
-# 3. 데이터 전처리 (표준 스케일링)
+# 3. 데이터 전처리 (표준 스케일링) --> sklearn.preprocessing라이브러리의 StandardScaler 
 # 학습 데이터에 fit하고 transform
 # 테스트 데이터는 학습 데이터의 기준으로 transform만 수행
-
-
-
-
+scaler = StandardScaler()
+X_train_scaler = scaler.fit_transform(X_train) # 학습데이터 fit_transform
+X_test_scaler = scaler.transform(X_test) # 테스트 데이터 학습데이터 기준으로 fransform
 
 
 # 4. 로지스틱 회귀 (max_iter=1000, random_state=77)
-
-
-
-
+log_reg_clf = LogisticRegression(solver='lbfgs', max_iter=1000, random_state=77)
+log_reg_clf.fit(X_train_scaler, y_train)
+y_pred_log_reg = log_reg_clf.predict(X_test_scaler)
 
 # 5. 모델 평가 (스케일링 적용 O)
 # 모델 평가 함수 정의
@@ -73,12 +71,11 @@ def evaluate_model(y_true, y_pred, model_name):
 # 평가 함수를 사용하여 모델 평가 및 혼동 행렬 생성
 print("\n--- 실습과제 결과 ---")
 # cm_lr_wine = ...
-
-
-
+cm_lr_wine = evaluate_model(y_test, y_pred_log_reg, "로지스틱 회귀")
 
 # 시각화: 혼동 행렬
 plt.figure(figsize=(6, 6))
+# annot=True: 셀 안에 숫자를 표시. fmt='d': 정수형으로 표시.
 sns.heatmap(cm_lr_wine, annot=True, fmt='d', cmap='Blues', xticklabels=wine.target_names, yticklabels=wine.target_names)
 plt.title("로지스틱 회귀 (스케일링 O)")
 plt.xlabel("예측된 레이블")
