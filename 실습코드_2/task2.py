@@ -1,8 +1,3 @@
-# 실습 과제 2: Support vector regressor (SVR) vs. Linear regression
-# 실습 목표: 캘리포니아 주택 가격 데이터셋을 사용하여 SVR과 Linear regression 모델을 학습하고, 성능을 비교 분석
-# 데이터 셋: scikit-learn의 'fetch_california_housing' 데이터
-# 평가 지표: Mean squared error (MSE), R-squared (R2)
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -41,6 +36,7 @@ def visualize_regression_performance(y_test, y_pred_svr, y_pred_lr):
     plt.tight_layout()
     plt.show()
 
+    # 평가 지표 계산
     mse_svr = mean_squared_error(y_test, y_pred_svr)
     r2_svr = r2_score(y_test, y_pred_svr)
     mse_lr = mean_squared_error(y_test, y_pred_lr)
@@ -69,55 +65,57 @@ def visualize_regression_performance(y_test, y_pred_svr, y_pred_lr):
 def main():
     # Step 1. 데이터 로드
     # Hint: fetch_california_housing() 함수 사용
-    
-
+    housing = fetch_california_housing()
+    X = housing.data
+    y = housing.target
 
     # Step 2. 데이터 분할
     # Hint: train_test_split() 함수 사용
     # 조건: test_size=0.3, random_state=77
-
-
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=77)
 
     # Step 3. 데이터 스케일링
     # Hint 1: StandardScaler 사용
     # Hint 2: train 데이터에 대해서만 fit()
-
-
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train) # 학습데이터 fit_transform
+    X_test_scaled = scaler.transform(X_test) # 테스트 데이터 학습데이터 기준으로 fransform
 
     # Step 4. 모델 학습
     # Hint: SVR와 LinearRegression 모델 객체를 각각 생성하고 학습(fit)
     # 조건: SVR의 kernel은 'rbf'로 설정 (gamma='auto')
 
     # 4-1. Support Vector Regressor (SVR) 학습
-
+    svr = SVR(kernel='rbf', gamma='auto')
+    svr.fit(X_train_scaled, y_train)
 
     # 4-2. Linear Regression 학습
-
-
+    lr = LinearRegression()
+    lr.fit(X_train_scaled, y_train)
 
     # Step 5. 모델 평가
     # Hint 1: 학습된 모델을 사용하여 test 데이터에 대한 예측(predict)을 수행
     # Hint 2: 이후 예측 결과와 실제 정답을 사용하여 평가 지표를 계산
 
     # 5-1. SVR 모델 평가
-    y_pred_svr = 
-    mse_svr = 
-    r2_svr = 
+    y_pred_svr = svr.predict(X_test_scaled)             # 예측 값
+    mse_svr = mean_squared_error(y_test, y_pred_svr)
+    r2_svr = r2_score(y_test, y_pred_svr)
     print("\n[SVR 모델 평가 결과]")
     print(f"  - Mean Squared Error (MSE): {mse_svr:.4f}")
     print(f"  - R-squared (R2): {r2_svr:.4f}")
 
     # 5-2. Linear regression 모델 평가
-    y_pred_lr = 
-    mse_lr = 
-    r2_lr = 
+    y_pred_lr = lr.predict(X_test_scaled)             # 예측 값
+    mse_lr = mean_squared_error(y_test, y_pred_lr)
+    r2_lr = r2_score(y_test, y_pred_lr)
     print("\n[Linear Regression 모델 평가 결과]")
     print(f"  - Mean Squared Error (MSE): {mse_lr:.4f}")
     print(f"  - R-squared (R2): {r2_lr:.4f}")
 
     # Step 6. 제공된 시각화 함수 호출
     # Hint: visualize_regression_performance()
-
+    visualize_regression_performance(y_test, y_pred_svr, y_pred_lr)
 
 if __name__ == '__main__':
     main()
